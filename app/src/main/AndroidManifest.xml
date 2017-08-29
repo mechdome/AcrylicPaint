@@ -48,6 +48,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".EasyPaint" />
         </activity>
+        <meta-data android:name="md_remove_ads" android:value="anupam.acrylic.MechDomeAd"/>
     </application>
 
 </manifest>

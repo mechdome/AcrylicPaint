@@ -65,6 +65,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mechdome.aboutmechdome.AboutMechDomeActivity;
+
 @SuppressLint("ClickableViewAccessibility")
 public class EasyPaint extends GraphicsActivity implements
 		ColorPickerDialog.OnColorChangedListener {
@@ -396,48 +398,6 @@ public class EasyPaint extends GraphicsActivity implements
 				mPaint.setShader( null );
 				mPaint.setMaskFilter(mEmboss);
 				return true;
-			case R.id.smudge_menu: {
-				/* I considered making this what happens when the blur_menu item is selected, but
-				 * that could surprise users who are used to blur_menu's previous functionality, so
-				 * I made this new smudge_menu item instead. I don't like calling it "Smudge" because
-				 * this isn't exactly the same as what Photoshop and GIMP refer to as "Smudge", but I
-				 * couldn't think of a better name that isn't "Blur".
-				 * ~TheOpenSourceNinja
-				 */
-				if( Build.VERSION.SDK_INT >= 17 ) {
-					/* Basically what we're doing here is copying the entire foreground bitmap,
-					 * blurring it, then telling mPaint to use that instead of a solid color.
-					 */
-					
-					RenderScript rs = RenderScript.create( getApplicationContext( ) );
-					ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create( rs, Element.RGBA_8888( rs ) );
-					script.setRadius( 20f ); //The radius must be between 0 and 25. Smaller radius means less blur. I just picked 20 randomly. ~TheOpenSourceNinja
-					
-					//copy the foreground: (n API level 18+, this will be really fast because it uses a shared memory model, thus not really copying everything)
-					Allocation input = Allocation.createFromBitmap( rs, contentView.mBitmap );
-					script.setInput( input );
-					
-					//allocate memory for the output:
-					Allocation output = Allocation.createTyped( rs, input.getType( ) );
-					
-					//Blur the image:
-					script.forEach( output );
-					
-					//Store the blurred image as a Bitmap object:
-					Bitmap blurred = Bitmap.createBitmap( contentView.mBitmap );
-					output.copyTo( blurred );
-					
-					//Tell mPaint to use the blurred image:
-					Shader shader = new BitmapShader( blurred, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP );
-					mPaint.setShader( shader );
-					return true;
-				} else {
-					Toast.makeText( this.getApplicationContext( ),
-									anupam.acrylic.R.string.ability_disabled_need_newer_api_level,
-									Toast.LENGTH_LONG ).show( );
-					return true;
-				}
-			}
 			case R.id.blur_menu:
 				mPaint.setShader( null );
 				mPaint.setMaskFilter(mBlur);
@@ -525,34 +485,6 @@ public class EasyPaint extends GraphicsActivity implements
 			case R.id.save_menu:
 				takeScreenshot(true);
 				break;
-			case R.id.share_menu: {
-				File screenshotPath = takeScreenshot( false );
-				Intent i = new Intent( );
-				i.setAction( Intent.ACTION_SEND );
-				i.setType( "image/png" );
-				i.putExtra( Intent.EXTRA_SUBJECT,
-							getString( anupam.acrylic.R.string.share_title_template ) );
-				i.putExtra( Intent.EXTRA_TEXT,
-							getString( anupam.acrylic.R.string.share_text_template ) );
-				i.putExtra( Intent.EXTRA_STREAM, Uri.fromFile( screenshotPath ) );
-				try {
-					startActivity( Intent.createChooser( i,
-														 getString( anupam.acrylic.R.string.toolbox_share_title ) ) );
-				} catch( android.content.ActivityNotFoundException ex ) {
-					Toast.makeText( this.getApplicationContext( ),
-									anupam.acrylic.R.string.no_way_to_share,
-									Toast.LENGTH_LONG ).show( );
-				}
-				break;
-			}
-			case R.id.open_image_menu: {
-				Intent intent = new Intent( );
-				intent.setType( "image/*" ); //The argument is an all-lower-case MIME type - in this case, any image format.
-				intent.setAction( Intent.ACTION_GET_CONTENT );
-				intent.putExtra( Intent.EXTRA_ALLOW_MULTIPLE, false ); //This is false by default, but I felt that for code clarity it was better to be explicit: we only want one image
-				startActivityForResult( Intent.createChooser( intent, getResources().getString( R.string.select_image_to_open ) ), CHOOSE_IMAGE );
-				break;
-			}
 			case R.id.fill_background_with_color: {
 				waitingForBackgroundColor = true;
 				new ColorPickerDialog( this, this, contentView.mBitmapBackground.getPixel( 0, 0 ) ).show();
@@ -560,6 +492,9 @@ public class EasyPaint extends GraphicsActivity implements
 			}
 			case R.id.about_menu:
 				startActivity(new Intent(this, AboutActivity.class));
+				break;
+			case R.id.about_mechdome:
+				startActivity(new Intent(this, AboutMechDomeActivity.class));
 				break;
 		}
 		return super.onOptionsItemSelected(item);

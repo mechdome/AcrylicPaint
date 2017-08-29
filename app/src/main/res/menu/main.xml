@@ -48,28 +48,10 @@
         android:title="@string/blur">
     </item>
     <item
-        android:id="@+id/smudge_menu"
-        android:icon="@drawable/smudge"
-        android:showAsAction="ifRoom"
-        android:title="@string/smudge">
-    </item>
-    <item
         android:id="@+id/save_menu"
         android:icon="@drawable/save"
         android:showAsAction="ifRoom"
         android:title="@string/save">
-    </item>
-    <item
-        android:id="@+id/share_menu"
-        android:icon="@drawable/share"
-        android:showAsAction="ifRoom"
-        android:title="@string/share">
-    </item>
-    <item
-        android:id="@+id/open_image_menu"
-        android:icon="@drawable/import_image"
-        android:showAsAction="ifRoom"
-        android:title="@string/open_image">
     </item>
     <item
         android:id="@+id/fill_background_with_color"
@@ -82,6 +64,11 @@
         android:icon="@+drawable/about"
         android:showAsAction="ifRoom"
         android:title="@string/about">
+    </item>
+    <item
+        android:id="@+id/about_mechdome"
+        android:showAsAction="ifRoom"
+        android:title="About MechDome">
     </item>
 
 </menu>
